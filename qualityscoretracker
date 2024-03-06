@@ -1,0 +1,46 @@
+function main() {
+    var spreadsheetUrl = 'SINUN GOOGLE SHEET URL TÄHÄN'; // Your sheet url to the left- Liitä google sheets tiedoston url 
+    var sheet = SpreadsheetApp.openByUrl(spreadsheetUrl).getActiveSheet();
+  
+    
+    // WWW.EVENRUE.FI SCRIPT - Quality score rapport
+ // voit muokata kohtaa var dadteRange = jos haluat dataa pitemmältä aikaväliltä
+    // Tarkista että taulukossassi on oikeat otsikot- Check if headers are already present; if not, append them
+
+    var lastRow = sheet.getLastRow();
+    var range = sheet.getRange(lastRow, 1, 1, 7);
+    var values = range.getValues();
+    var headers = ['CampaignName', 'AdGroupName', 'Criteria', 'QualityScore', 'Impressions', 'Clicks', 'Cost'];
+    
+    if (lastRow == 0 || values[0].join("") != headers.join("")) {
+      sheet.appendRow(headers);
+    }
+  
+    // Query Google Ads for keywords data
+    var report = AdsApp.report(
+      'SELECT CampaignName, AdGroupName, Criteria, QualityScore, Impressions, Clicks, Cost ' +
+      'FROM KEYWORDS_PERFORMANCE_REPORT ' +
+      'WHERE QualityScore >= 1 AND QualityScore <= 10 ' + // Ensures Quality Score is not null
+      'DURING LAST_30_DAYS');
+  
+    var rows = report.rows();
+    while (rows.hasNext()) {
+      var row = rows.next();
+      var data = [
+        row['CampaignName'],
+        row['AdGroupName'],
+        row['Criteria'],
+        row['QualityScore'],
+        row['Impressions'],
+        row['Clicks'],
+        row['Cost']
+      ];
+  
+      // Append the keyword data to the sheet
+      sheet.appendRow(data);
+    }
+  
+    // Log completion
+    Logger.log('Quality Score data has been written to your spreadsheet.');
+  }
+  
