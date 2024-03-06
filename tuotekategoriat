@@ -11,7 +11,7 @@ function main() {
     var sheet = spreadsheet.getSheetByName(sheetName);
     
     sheet.clearContents();
-    var headers = ['Offer ID', 'Product Title', 'Clicks', 'Impressions', 'Cost', 'Conversions', 'Conversion Value'];
+    var headers = ['Tuote ID', 'Tuotteen otsikko', 'Klikkaukset', 'Impressiot', 'Hinta', 'Konversiot', 'Konversioiden arvo'];
     sheet.appendRow(headers);
     
     var dateRange = 'LAST_30_DAYS';
