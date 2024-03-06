@@ -1,0 +1,38 @@
+function main() {
+  
+    //kopio oman Google Sheets tiedostosi url alla olevan tilalle
+    var spreadsheetUrl = 'https://docs.google.com/spreadsheets/d/1DQsFKlBmxwgox7neyR_bhIyooxj1m5WuBxX-ZodNCRs/edit#gid=957987761'; 
+    var sheetName = 'Evenrue-Raw Data';
+  
+  // WWW.EVENRUE.FI SCRIPT - TUOTTEIDEN TEHOKKUUS SHOPPING VERKOSTOSSA
+   // voit muokata kohtaa var dadteRange = jos haluat dataa pitemmältä aikaväliltä
+    
+    var spreadsheet = SpreadsheetApp.openByUrl(spreadsheetUrl);
+    var sheet = spreadsheet.getSheetByName(sheetName);
+    
+    sheet.clearContents();
+    var headers = ['Offer ID', 'Product Title', 'Clicks', 'Impressions', 'Cost', 'Conversions', 'Conversion Value'];
+    sheet.appendRow(headers);
+    
+    var dateRange = 'LAST_30_DAYS';
+    
+    var query = "SELECT segments.product_item_id, segments.product_title, metrics.clicks, metrics.impressions, metrics.cost_micros, metrics.conversions, metrics.conversions_value " +
+                "FROM shopping_performance_view " +
+                "WHERE segments.date DURING " + dateRange;
+    
+    var report = AdsApp.report(query);
+    var rows = report.rows();
+    while (rows.hasNext()) {
+      var row = rows.next();
+      
+      var offerId = row['segments.product_item_id'];
+      var productTitle = row['segments.product_title'];
+      var clicks = row['metrics.clicks'];
+      var impressions = row['metrics.impressions'];
+      var cost = parseFloat(row['metrics.cost_micros']) / 1000000; 
+      var conversions = row['metrics.conversions'];
+      var conversionValue = row['metrics.conversions_value'];
+      
+      sheet.appendRow([offerId, productTitle, clicks, impressions, cost, conversions, conversionValue]); 
+    }
+  }
